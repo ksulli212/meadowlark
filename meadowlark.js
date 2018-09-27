@@ -2,13 +2,7 @@ var express = require("express");
 
 var app = express();
 
-var fortunes = [
-	"Conquer your fears or they will conquer you", 
-	"Rivers need springs",
-	"Do not fear what you don't know",
-	"You will have a pleasant surprise",
-	"Whenever possible, keep it simple"
-];
+var fortune = require("./fortune");
 
 var handlebars = require("express-handlebars")
 	.create({defaultLayout: "main"});
@@ -17,10 +11,23 @@ app.set("view engine", "handlebars");
 
 app.set("port", process.env.PORT || 3001);
 
+app.use(function(req, res, next){
+	res.locals.showTests = app.get("env") !== "production" && req.query.test === "1";
+	next();
+});
+
 app.get("/", function(req, res){
 	res.render("home");
 //	res.type("text/plain");
 //	res.send("Meadowlark Travel");
+});
+
+app.get("/tours/hood-river", function(req, res){
+	res.render("tours/hood-river");
+});
+
+app.get("/tours/request-group-rate", function(req, res){
+	res.render("tours/request-group-rate");
 });
 
 app.get("/datetime", function(req, res){
@@ -28,12 +35,14 @@ app.get("/datetime", function(req, res){
 });
 
 app.get("/about", function(req, res){
-	var randomFortune = 
-		fortunes[Math.floor(Math.random() * fortunes.length)];
-	res.render("about", { fortunes: randomFortune });
+
+	res.render("about", { fortunes: fortune.getFortune(), pageTestScript: "/qa/tests-about.js" });
+	
 //	res.type("text/plain");
 //	res.send("About Meadowlark Travel");
 });
+
+
 
 app.use(express.static(__dirname + "/public"));
 
