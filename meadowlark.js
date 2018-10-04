@@ -42,7 +42,12 @@ app.get("/about", function(req, res){
 //	res.send("About Meadowlark Travel");
 });
 
-
+app.get("/header", function(req, res){
+	res.set("Content-Type", "text/plain");
+	var s = "";
+	for(var name in req.headers) {s += name + ": " + req.headers[name] + "/n"};
+	res.send(s);
+});
 
 app.use(express.static(__dirname + "/public"));
 
