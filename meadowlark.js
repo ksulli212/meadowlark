@@ -16,11 +16,45 @@ app.use(function(req, res, next){
 	next();
 });
 
+
+app.use(function(req, res, next){
+	if(!res.locals.partials) res.locals.partials = {};
+ 	res.locals.partials.weatherContext = {
+		locations: [
+            {
+                name: 'Portland',
+                forecastUrl: 'http://www.wunderground.com/US/OR/Portland.html',
+                iconUrl: 'http://icons-ak.wxug.com/i/c/k/cloudy.gif',
+                weather: 'Overcast',
+                temp: '54.1 F (12.3 C)',
+            },
+            {
+                name: 'Bend',
+                forecastUrl: 'http://www.wunderground.com/US/OR/Bend.html',
+                iconUrl: 'http://icons-ak.wxug.com/i/c/k/partlycloudy.gif',
+                weather: 'Partly Cloudy',
+                temp: '55.0 F (12.8 C)',
+            },
+            {
+                name: 'Manzanita',
+                forecastUrl: 'http://www.wunderground.com/US/OR/Manzanita.html',
+                iconUrl: 'http://icons-ak.wxug.com/i/c/k/rain.gif',
+                weather: 'Light Rain',
+                temp: '55.0 F (12.8 C)',
+            },
+        ],
+}
+	next();
+});
+
+app.use(require("body-parser").urlencoded({extended: true }));
+
 app.get("/", function(req, res){
 	res.render("home");
 //	res.type("text/plain");
 //	res.send("Meadowlark Travel");
 });
+
 
 app.get("/tours/hood-river", function(req, res){
 	res.render("tours/hood-river");
@@ -28,6 +62,21 @@ app.get("/tours/hood-river", function(req, res){
 
 app.get("/tours/request-group-rate", function(req, res){
 	res.render("tours/request-group-rate");
+});
+
+app.get("/tours-info",function(req, res){
+	res.render("tours-info",{
+		currency:{
+			name: "United States dollars",
+			abbrev: "USD",
+			},
+		tours: [
+			{name: "Hood River", price: "$99.95"},
+			{name: "Oregon Coast", price: "$159.95"},
+			],
+		specialUrl: "/january-special",
+		currencies: ["USD", "GBP", "BTC"],
+	});
 });
 
 app.get("/datetime", function(req, res){
@@ -42,12 +91,6 @@ app.get("/about", function(req, res){
 //	res.send("About Meadowlark Travel");
 });
 
-app.get("/header", function(req, res){
-	res.set("Content-Type", "text/plain");
-	var s = "";
-	for(var name in req.headers) {s += name + ": " + req.headers[name] + "/n"};
-	res.send(s);
-});
 
 app.use(express.static(__dirname + "/public"));
 
