@@ -49,12 +49,52 @@ app.use(function(req, res, next){
 
 app.use(require("body-parser").urlencoded({extended: true }));
 
+var credentials = require("./credentials.js")
+
+app.use(require("cookie-parser")(credentials.cookieSecret));
+
+
 app.get("/", function(req, res){
+//	res.cookie("monster", "nom nom");
+	console.log()
 	res.render("home");
 //	res.type("text/plain");
 //	res.send("Meadowlark Travel");
 });
 
+
+app.get("/newsletter",function(req, res){
+res.render("newsletter", { csrf: "CSRF token goes here"});
+});
+/*
+app.post("/process", function(req, res){
+
+console.log("Form (from querystrin: " + req.query.form);
+console.log("CSRF token(from hidden form field): " + req.body._csrf);
+console.log("Name (from visible form field): " + req.body.name);
+console.log("Email (from visible form field): " + req.body.email);
+res.redirect(303, "/thank you");
+});
+*/
+app.get("/newsletters",function(req, res){
+res.render("newsletters", { csrf: "CSRF token goes here"});
+
+});
+app.post("/process", function(req, res){
+	if(req.xhr || req.accepts("json,html")==="json"){
+	console.log(JSON.stringify(req.body));
+res.send({
+ 
+	success: true,
+	message: "Hello World!"
+	 });
+}
+else{
+
+res.redirect(303,"/thank-you");
+}
+
+});
 
 app.get("/tours/hood-river", function(req, res){
 	res.render("tours/hood-river");
